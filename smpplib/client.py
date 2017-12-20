@@ -322,9 +322,13 @@ class Client(object):
                 break
             self.read_once(ignore_error_codes)
 
+    def listen_stop(self):
+        self.run = False
+
     def listen(self, ignore_error_codes=None):
         """Listen for PDUs and act"""
-        while True:
+        self.run = True
+        while self.run:
             self.read_once(ignore_error_codes)
 
     def send_message(self, **kwargs):

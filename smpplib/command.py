@@ -71,9 +71,7 @@ def get_optional_name(code):
         if value == code:
             return key
 
-    raise exceptions.UnknownCommandError(
-        'Unknown SMPP command code "0x%x"' % code)
-
+    return str(hex(code))
 
 def get_optional_code(name):
     """Return optional_params code by given command name. If name is unknown,
@@ -347,8 +345,12 @@ class Command(pdu.PDU):
             type_code, pos = unpack_short(data, pos)
             field = get_optional_name(type_code)
             length, pos = unpack_short(data, pos)
-
-            param = self.params[field]
+            if field in self.params:
+                param = self.params[field]
+            else:
+                param = Param(type=str, size=length)
+                self.params[field] = param
+                logger.warning('Unkown TLV: %s', field)
             if param.type is int:
                 data, pos = self._parse_int(field, data, pos)
             elif param.type in (str, ostr):
