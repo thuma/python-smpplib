@@ -301,6 +301,8 @@ class Client(object):
                 self._enquire_link_received()
             elif p.command == 'enquire_link_resp':
                 pass
+            elif p.command == 'unbind_resp':
+                self.run = False
             elif p.command == 'alert_notification':
                 self._alert_notification(p)
             else:
