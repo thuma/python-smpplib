@@ -36,6 +36,18 @@ def gsm_encode(plaintext, hex=False):
         raise EncodeError()
     return binascii.b2a_hex(res) if hex else res
 
+def gsm_decode(instring, hex=False):
+    if hex:
+        instring = binascii.a2b_hex(instring)
+    chars = iter(instring)
+    result = []
+    for c in chars:
+        if c == chr(27):
+            c = next(chars)
+            result.append(ext[ord(c)])
+        else:
+            result.append(gsm[ord(c)])
+    return ''.join(result)
 
 def make_parts(text):
     """Returns tuple(parts, encoding, esm_class)"""
