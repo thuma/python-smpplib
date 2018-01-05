@@ -152,14 +152,8 @@ class Client(object):
 
     def unbind(self):
         """Unbind from the SMSC"""
-
         p = smpp.make_pdu('unbind', client=self)
-
         self.send_pdu(p)
-        try:
-            return self.read_pdu()
-        except socket.timeout:
-            raise exceptions.ConnectionError()
 
     def send_pdu(self, p):
         """Send PDU to the SMSC"""
@@ -233,14 +227,17 @@ class Client(object):
         raise NotImplementedError('not implemented')
 
     def _message_received(self, p):
-        """Handler for received message event"""
+        """Handler for received message event, Return False from
+        message_received_handler to make your own deliver_sm_resp,
+        for example to handle asyc functions."""
         status = self.message_received_handler(pdu=p)
         if status is None:
             status = consts.SMPP_ESME_ROK
-        dsmr = smpp.make_pdu('deliver_sm_resp', client=self, status=status)
-        #, message_id=args['pdu'].sm_default_msg_id)
-        dsmr.sequence = p.sequence
-        self.send_pdu(dsmr)
+        elif status != False:
+            dsmr = smpp.make_pdu('deliver_sm_resp', client=self, status=status)
+            #, message_id=args['pdu'].sm_default_msg_id)
+            dsmr.sequence = p.sequence
+            self.send_pdu(dsmr)
 
     def _enquire_link_received(self):
         """Response to enquire_link"""
@@ -264,7 +261,6 @@ class Client(object):
     @staticmethod
     def message_received_handler(pdu, **kwargs):
         """Custom handler to process received message. May be overridden"""
-
         logger.warning('Message received handler (Override me)')
 
     @staticmethod
@@ -302,7 +298,10 @@ class Client(object):
             elif p.command == 'enquire_link_resp':
                 pass
             elif p.command == 'unbind_resp':
-                self.run = False
+                if p.status == const.SMPP_ESME_ROK:
+                    self.run = False
+                else:
+                    logger.warning('SMPP unbind failed with error "%s"', p.status)
             elif p.command == 'alert_notification':
                 self._alert_notification(p)
             else:
