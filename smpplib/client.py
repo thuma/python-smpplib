@@ -298,7 +298,7 @@ class Client(object):
             elif p.command == 'enquire_link_resp':
                 pass
             elif p.command == 'unbind_resp':
-                if p.status == const.SMPP_ESME_ROK:
+                if p.status == consts.SMPP_ESME_ROK:
                     self.run = False
                 else:
                     logger.warning('SMPP unbind failed with error "%s"', p.status)
