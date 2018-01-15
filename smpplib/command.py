@@ -841,7 +841,7 @@ class Unbind(Command):
 
     def __init__(self, command, **kwargs):
         """Initialize"""
-        super(Unbind, self).__init__(command, need_sequence=False, **kwargs)
+        super(Unbind, self).__init__(command, **kwargs)
 
 
 class UnbindResp(Command):
@@ -863,8 +863,7 @@ class EnquireLink(Command):
 
     def __init__(self, command, **kwargs):
         """Initialize"""
-        super(EnquireLink, self).__init__(command, need_sequence=False,
-            **kwargs)
+        super(EnquireLink, self).__init__(command, **kwargs)
 
 
 class EnquireLinkResp(Command):
