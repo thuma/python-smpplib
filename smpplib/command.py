@@ -71,7 +71,7 @@ def get_optional_name(code):
         if value == code:
             return key
 
-    return str(hex(code))
+    return "TLV_%x" % code
 
 def get_optional_code(name):
     """Return optional_params code by given command name. If name is unknown,
