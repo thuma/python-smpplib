@@ -286,8 +286,16 @@ class Client(object):
                     '({}) {}: {}'.format(p.status, p.command,
                     consts.DESCRIPTIONS.get(p.status, 'Unknown status')), int(p.status))
 
-            if p.command == 'unbind':  # unbind_res
+            if p.command == 'unbind':
                 logger.info('Unbind command received')
+                resp_pdu = smpp.make_pdu(
+                    'unbind_resp',
+                    client=self,
+                    command_status=consts.SMPP_ESME_ROK,
+                    sequence_number=resp_pdu.sequence_number)
+                self.send_pdu(resp_pdu)
+                logger.info('Unbind resp sent')
+                self.state = const.SMPP_CLIENT_STATE_OPEN
                 return
             elif p.command == 'submit_sm_resp':
                 self.message_sent_handler(pdu=p)
