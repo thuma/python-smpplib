@@ -108,16 +108,14 @@ class PDU(object):
 
     def parse_udh(self):
         """Parsing the UDH"""
-        (udh_lenght) = struct.unpack('>B', self.short_message[0:1])
+        (udh_lenght, ) = struct.unpack('>B', self.short_message[0:1])
         (udh_data_type, udh_data_lenght ) = struct.unpack('>BB', self.short_message[1:3])
-
         if udh_data_type == consts.SMPP_UDHIEIE_CONCATENATED and udh_data_lenght == 3:
             (
               self.sar_msg_ref_num,
               self.sar_total_segments,
               self.sar_segment_seqnum
-            ) = struct.unpack('>BBB', self.short_message[3:udh_lenght])
-
+            ) = struct.unpack('>BBB', self.short_message[3:3+udh_data_lenght])
             self.short_message = self.short_message[udh_lenght+1:]
 
     def parse(self, data):
@@ -146,7 +144,7 @@ class PDU(object):
         if len(data) > 16:
             self.parse_params(data[16:])
 
-        if getattr(self, 'esm_class', 0) & consts.SMPP_GSMFEAT_UDHI:
+        if int(getattr(self, 'esm_class', '0')) & consts.SMPP_GSMFEAT_UDHI:
             self.parse_udh()
 
     def generate(self):
