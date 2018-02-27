@@ -114,8 +114,9 @@ class PDU(object):
         if udh_data_type == SMPP_UDHIEIE_CONCATENATED and udh_data_lenght == 3:
             (
               self.sar_msg_ref_num,
-              self.sar_total_segments
-            ) = struct.unpack('>BB', self.short_message[3:udh_lenght])
+              self.sar_total_segments,
+              self.sar_segment_seqnum
+            ) = struct.unpack('>BBB', self.short_message[3:udh_lenght])
 
             self.short_message = self.short_message[udh_lenght+1:]
 
