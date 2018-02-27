@@ -146,7 +146,7 @@ class PDU(object):
         if len(data) > 16:
             self.parse_params(data[16:])
 
-        if pdu.esm_class & SMPP_GSMFEAT_UDHI:
+        if 'esm_class' in self and self.esm_class & SMPP_GSMFEAT_UDHI:
             self.parse_udh()
 
     def generate(self):
