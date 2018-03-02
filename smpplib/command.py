@@ -446,7 +446,7 @@ class BindTransmitterResp(Command):
     """Response for bind as a transmitter command"""
 
     params = {
-        'system_id': Param(type=str),
+        'system_id': Param(type=str, max=16),
         'sc_interface_version': Param(type=int, size=1),
     }
 
