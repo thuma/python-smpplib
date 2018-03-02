@@ -63,14 +63,15 @@ class Client(object):
     vendor = None
     _socket = None
     sequence_generator = None
+    timeout = 5
 
     def __init__(self, host, port, timeout=5, sequence_generator=None):
         """Initialize"""
-
+        self.timeout = timeout
         self.host = host
         self.port = int(port)
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._socket.settimeout(timeout)
+        self._socket.settimeout(self.timeout)
         self.receiver_mode = False
         if sequence_generator is None:
             sequence_generator = SimpleSequenceGenerator()
@@ -103,6 +104,7 @@ class Client(object):
         try:
             if self._socket is None:
                 self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self._socket.settimeout(self.timeout)
             self._socket.connect((self.host, self.port))
             self.state = consts.SMPP_CLIENT_STATE_OPEN
         except socket.error:
