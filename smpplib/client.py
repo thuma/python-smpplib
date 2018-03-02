@@ -294,7 +294,7 @@ class Client(object):
                     'unbind_resp',
                     client=self,
                     command_status=consts.SMPP_ESME_ROK,
-                    sequence_number=p.sequence_number)
+                    sequence=p.sequence)
                 self.send_pdu(resp_pdu)
                 logger.info('Unbind resp sent')
                 self.state = const.SMPP_CLIENT_STATE_OPEN
