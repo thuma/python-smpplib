@@ -297,7 +297,7 @@ class Client(object):
                     sequence=p.sequence)
                 self.send_pdu(resp_pdu)
                 logger.info('Unbind resp sent')
-                self.state = const.SMPP_CLIENT_STATE_OPEN
+                self.state = consts.SMPP_CLIENT_STATE_OPEN
                 return
             elif p.command == 'submit_sm_resp':
                 self.message_sent_handler(pdu=p)
