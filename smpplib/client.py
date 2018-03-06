@@ -283,7 +283,7 @@ class Client(object):
                 self.send_pdu(p)
                 return
 
-            if p.is_error():
+            if p.is_error() and not p.command =='submit_sm_resp':
                 raise exceptions.PDUError(
                     '({}) {}: {}'.format(p.status, p.command,
                     consts.DESCRIPTIONS.get(p.status, 'Unknown status')), int(p.status))
