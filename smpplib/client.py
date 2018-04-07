@@ -241,6 +241,19 @@ class Client(object):
             dsmr.sequence = p.sequence
             self.send_pdu(dsmr)
 
+    def _unbind_received(self, p):
+        """Response to unbind"""
+        logger.info('Unbind command received')
+        resp_pdu = smpp.make_pdu(
+            'unbind_resp',
+            client=self,
+            command_status=consts.SMPP_ESME_ROK
+            )
+        resp_pdu.sequence=p.sequence
+        self.send_pdu(resp_pdu)
+        logger.info('Unbind resp sent')
+        self.state = consts.SMPP_CLIENT_STATE_OPEN
+
     def _enquire_link_received(self, p):
         """Response to enquire_link"""
         ler = smpp.make_pdu('enquire_link_resp', client=self)
@@ -290,16 +303,7 @@ class Client(object):
                     consts.DESCRIPTIONS.get(p.status, 'Unknown status')), int(p.status))
 
             if p.command == 'unbind':
-                logger.info('Unbind command received')
-                resp_pdu = smpp.make_pdu(
-                    'unbind_resp',
-                    client=self,
-                    command_status=consts.SMPP_ESME_ROK,
-                    sequence=p.sequence)
-                self.send_pdu(resp_pdu)
-                logger.info('Unbind resp sent')
-                self.state = consts.SMPP_CLIENT_STATE_OPEN
-                return
+                self._unbind_received(p)
             elif p.command == 'submit_sm_resp':
                 self.message_sent_handler(pdu=p)
             elif p.command == 'deliver_sm':
