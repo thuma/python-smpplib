@@ -241,10 +241,11 @@ class Client(object):
             dsmr.sequence = p.sequence
             self.send_pdu(dsmr)
 
-    def _enquire_link_received(self):
+    def _enquire_link_received(self, p):
         """Response to enquire_link"""
         ler = smpp.make_pdu('enquire_link_resp', client=self)
         #, message_id=args['pdu'].sm_default_msg_id)
+        ler.sequence = p.sequence
         self.send_pdu(ler)
         logger.debug("Link Enquiry...")
 
@@ -304,7 +305,7 @@ class Client(object):
             elif p.command == 'deliver_sm':
                 self._message_received(p)
             elif p.command == 'enquire_link':
-                self._enquire_link_received()
+                self._enquire_link_received(p)
             elif p.command == 'enquire_link_resp':
                 pass
             elif p.command == 'unbind_resp':
