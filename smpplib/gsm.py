@@ -58,10 +58,11 @@ def make_parts(text):
         partsize = consts.SEVENBIT_MP_SIZE
         encode = six.b
     except EncodeError:
+        text = binascii.hexlify(text.encode('utf-16-be'))
         encoding = consts.SMPP_ENCODING_ISO10646
-        need_split = len(text) > consts.UCS2_SIZE
-        partsize = consts.UCS2_MP_SIZE
-        encode = lambda s: s.encode('utf-16-be')
+        need_split = len(text) > consts.UCS2_SIZE * 4
+        partsize = consts.UCS2_MP_SIZE * 4
+        encode = lambda s: binascii.unhexlify(s)
 
     esm_class = consts.SMPP_MSGTYPE_DEFAULT
 
