@@ -245,7 +245,8 @@ class Client(object):
 
     def _unbind_received(self, p):
         """Response to unbind"""
-        logger.info('Unbind command received')
+        logger.info('Unbind command received stopping sending.')
+        self.state = consts.SMPP_CLIENT_STATE_OPEN
         resp_pdu = smpp.make_pdu(
             'unbind_resp',
             client=self,
@@ -255,6 +256,7 @@ class Client(object):
         self.send_pdu(resp_pdu)
         logger.info('Unbind resp sent')
         self.state = consts.SMPP_CLIENT_STATE_OPEN
+        raise UnbindFromServer('Server made unbind')
 
     def _enquire_link_received(self, p):
         """Response to enquire_link"""
