@@ -191,8 +191,10 @@ class Client(object):
 
         logger.debug('Waiting for PDU...')
 
+        raw_len = ''
         try:
-            raw_len = self._socket.recv(4)
+            while len(raw_len) < 4:
+                raw_len += self._socket.recv(4 - len(raw_len))
         except socket.timeout:
             raise
         except socket.error as e:
