@@ -299,7 +299,7 @@ class Client(object):
         logger.warning('Message sent handler (Override me)')
 
     @staticmethod
-    def unbind_received_handlerpdu, **kwargs):
+    def unbind_received_handler(pdu, **kwargs):
         """Called when SMPP server sends undbind.
         May be overridden"""
         logger.warning('Ubind from SMPP server (Override me)')
@@ -345,6 +345,9 @@ class Client(object):
                     and e.args[1] in ignore_error_codes:
                 logging.warning('(%d) %s. Ignored.' %
                     (e.args[1], e.args[0]))
+            elif self.state == consts.SMPP_CLIENT_STATE_OPEN \
+                or self.state == consts.SMPP_CLIENT_STATE_CLOSED:
+                raise exceptions.UnbindFromServer('Server unbind complete')
             else:
                 raise
 
