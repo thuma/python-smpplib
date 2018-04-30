@@ -239,25 +239,28 @@ class Client(object):
         status = self.message_received_handler(pdu=p)
         if status is None:
             status = consts.SMPP_ESME_ROK
-        elif status != False:
+        if status != False:
             dsmr = smpp.make_pdu('deliver_sm_resp', client=self, status=status)
-            #, message_id=args['pdu'].sm_default_msg_id)
             dsmr.sequence = p.sequence
             self.send_pdu(dsmr)
 
     def _unbind_received(self, p):
         """Response to unbind"""
-        logger.info('Unbind command received stopping sending.')
-        resp_pdu = smpp.make_pdu(
-            'unbind_resp',
-            client=self,
-            command_status=consts.SMPP_ESME_ROK
-            )
-        resp_pdu.sequence=p.sequence
-        self.send_pdu(resp_pdu)
-        logger.info('Unbind resp sent')
-        self.state = consts.SMPP_CLIENT_STATE_OPEN
-        raise exceptions.UnbindFromServer('Server made unbind')
+        status = self.unbind_received_handler(pdu=p)
+        if status is None:
+            status = consts.SMPP_ESME_ROK
+        if status != False:
+            resp_pdu = smpp.make_pdu(
+                'unbind_resp',
+                client=self,
+                command_status=consts.SMPP_ESME_ROK
+                )
+            logger.info('Unbind command received stopping sending.')
+            resp_pdu.sequence=p.sequence
+            self.send_pdu(resp_pdu)
+            logger.info('Unbind resp sent')
+            self.state = consts.SMPP_CLIENT_STATE_OPEN
+            raise exceptions.UnbindFromServer('Server made unbind')
 
     def _enquire_link_received(self, p):
         """Response to enquire_link"""
@@ -279,9 +282,14 @@ class Client(object):
         """Set new function to handle message sent event"""
         self.message_sent_handler = func
 
+    def set_unbind_received_handler(self, func):
+        """Set new function to handle message receive event"""
+        self.unbind_received_handler = func
+
     @staticmethod
     def message_received_handler(pdu, **kwargs):
-        """Custom handler to process received message. May be overridden"""
+        """Custom handler to process received message.
+        May be overridden"""
         logger.warning('Message received handler (Override me)')
 
     @staticmethod
@@ -290,6 +298,11 @@ class Client(object):
         May be overridden"""
         logger.warning('Message sent handler (Override me)')
 
+    @staticmethod
+    def unbind_received_handlerpdu, **kwargs):
+        """Called when SMPP server sends undbind.
+        May be overridden"""
+        logger.warning('Ubind from SMPP server (Override me)')
 
     def read_once(self, ignore_error_codes=None):
         """Read a PDU and act"""
