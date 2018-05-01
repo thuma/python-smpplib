@@ -194,8 +194,13 @@ class Client(object):
         raw_len = ''
         try:
             while len(raw_len) < 4:
-                raw_len += self._socket.recv(4 - len(raw_len))
+                logger.debug('Waiting for more header data')
+                new_data = self._socket.recv(4 - len(raw_len))
+                raw_len += new_data
+                if new_data == '':
+                    raise exceptions.ConnectionError()
         except socket.timeout:
+            logger.debug('Socket timeout')
             raise
         except socket.error as e:
             logger.warning(e)
@@ -212,7 +217,10 @@ class Client(object):
         logger.debug('Reading PDU of %s bytes', length)
         raw_pdu = raw_len
         while len(raw_pdu) < length:
-          raw_pdu += self._socket.recv(length - len(raw_pdu))
+          new_data = self._socket.recv(length - len(raw_pdu))
+          raw_pdu += new_data
+          if new_data == '':
+              raise exceptions.ConnectionError()
 
         logger.debug('<<%s (%d bytes)', binascii.b2a_hex(raw_pdu), len(raw_pdu))
 
