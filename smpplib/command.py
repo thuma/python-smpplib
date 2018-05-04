@@ -572,7 +572,8 @@ class DataSMResp(Command):
 class GenericNAck(Command):
     """General Negative Acknowledgement class"""
 
-    _defs = []
+    params_order = tuple()
+    parms = {}
 
     def __init__(self, command, **kwargs):
         """Initialize"""

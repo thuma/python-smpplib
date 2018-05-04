@@ -323,14 +323,14 @@ class Client(object):
                 self.send_pdu(p)
                 return
 
-            if p.is_error() and not p.command =='submit_sm_resp':
+            if p.is_error() and not p.command =='submit_sm_resp' and not 'generic_nack':
                 raise exceptions.PDUError(
                     '({}) {}: {}'.format(p.status, p.command,
                     consts.DESCRIPTIONS.get(p.status, 'Unknown status')), int(p.status))
 
             if p.command == 'unbind':
                 self._unbind_received(p)
-            elif p.command == 'submit_sm_resp':
+            elif p.command in ['submit_sm_resp', 'generic_nack']:
                 self.message_sent_handler(pdu=p)
             elif p.command == 'deliver_sm':
                 self._message_received(p)
